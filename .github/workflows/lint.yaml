@@ -2,9 +2,12 @@ name: Lint
 on:
   pull_request:
     branches:
-        - main
+      - main
+  push:
+    branches:
+      - main
 jobs:
-  build:
+  lint:
     name: Lint Go
     runs-on: ubuntu-latest
     steps:

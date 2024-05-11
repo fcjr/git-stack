@@ -50,7 +50,7 @@ This project uses [goreleaser](https://github.com/goreleaser/goreleaser/).
 
 [release-img]: https://img.shields.io/github/v/release/fcjr/git-stack
 [release]: https://github.com/fcjr/git-stack/releases
-[golangci-lint-img]: https://github.com/fcjr/git-stack/workflows/go-lint/badge.svg
-[golangci-lint]: https://github.com/fcjr/git-stack/actions?query=workflow%3Ago-lint
+[golangci-lint-img]: https://github.com/fcjr/git-stack/actions/workflows/lint.yaml/badge.svg?branch=main
+[golangci-lint]: https://github.com/fcjr/git-stack/actions?query=workflow%3Ago-lint+branch%3Amain
 [report-card-img]: https://goreportcard.com/badge/github.com/fcjr/git-stack
 [report-card]: https://goreportcard.com/report/github.com/fcjr/git-stack
