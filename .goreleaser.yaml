@@ -1,0 +1,158 @@
+project_name: git-stack
+before:
+  hooks:
+    - go mod tidy
+    - ./scripts/completions.sh
+    - ./scripts/manpages.sh
+builds:
+  - id: git-stack
+    main: ./cmd/git-stack
+    ldflags:
+      - -s -w -X github.com/fcjr/git-stack/internal/version.Version={{ .Version }}
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    ignore:
+      - goos: windows
+        goarch: arm64
+archives:
+  - format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    builds_info:
+      group: root
+      owner: root
+    files:
+      - README.md
+      - LICENSE
+      - completions/*
+      - manpages/*
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+nfpms:
+  - builds:
+      - git-stack
+    vendor: Left Shift Logical, LLC.
+    homepage: https://www.leftshift.com
+    maintainer: Left Shift Logical, LLC <support@leftshift.com>
+    description: Stack based git workflow for GitHub
+    bindir: /usr/bin
+    section: utils
+    contents:
+      - src: ./completions/git-stack.bash
+        dst: /usr/share/bash-completion/completions/git-stack
+        file_info:
+          mode: 0644
+      - src: ./completions/git-stack.fish
+        dst: /usr/share/fish/vendor_completions.d/git-stack.fish
+        file_info:
+          mode: 0644
+      - src: ./completions/git-stack.zsh
+        dst: /usr/share/zsh/vendor-completions/_git-stack
+        file_info:
+          mode: 0644
+      - src: ./manpages/git-stack.1.gz
+        dst: /usr/share/man/man1/git-stack.1.gz
+        file_info:
+          mode: 0644
+      - src: ./LICENSE
+        dst: /usr/share/doc/git-stack/copyright
+        file_info:
+          mode: 0644
+    formats:
+      - apk
+      - deb
+      - rpm
+      - archlinux
+    dependencies:
+      - git
+    recommends:
+      - golang
+    deb:
+      lintian_overrides:
+        - statically-linked-binary
+        - changelog-file-missing-in-native-package
+brews:
+  - repository:
+      owner: fcjr
+      name: homebrew-fcjr
+    commit_author:
+      name: leftshift-bot
+      email: support@leftshift.com
+    homepage: https://github.com/fcjr/git-stack
+    description: Stack based git workflow for GitHub
+    install: |
+      bin.install "git-stack"
+    extra_install: |-
+      bash_completion.install "completions/git-stack.bash" => "git-stack"
+      zsh_completion.install "completions/git-stack.zsh" => "_git-stack"
+      fish_completion.install "completions/git-stack.fish"
+      man1.install "manpages/git-stack.1.gz"
+scoops:
+  -
+    repository:
+      owner: fcjr
+      name: scoop-fcjr
+    commit_author:
+      name: leftshift-bot
+      email: support@leftshift.com
+    homepage: https://github.com/fcjr/git-stack
+    description: Stack based git workflow for GitHub
+aurs:
+  - homepage: https://github.com/fcjr/git-stack
+    description: Stack based git workflow for GitHub
+    maintainers:
+      - "Left Shift Logical, LLC. <support at leftshift dot com>"
+    license: MIT
+    private_key: "{{ .Env.AUR_KEY }}"
+    git_url: "ssh://aur@aur.archlinux.org/git-stack-bin.git"
+    package: |-
+      # bin
+      install -Dm755 "./git-stack" "${pkgdir}/usr/bin/git-stack"
+
+      # license
+      install -Dm644 "./LICENSE" "${pkgdir}/usr/share/licenses/git-stack/LICENSE"
+
+      # completions
+      mkdir -p "${pkgdir}/usr/share/bash-completion/completions/"
+      mkdir -p "${pkgdir}/usr/share/zsh/site-functions/"
+      mkdir -p "${pkgdir}/usr/share/fish/vendor_completions.d/"
+      install -Dm644 "./completions/git-stack.bash" "${pkgdir}/usr/share/bash-completion/completions/git-stack"
+      install -Dm644 "./completions/git-stack.zsh" "${pkgdir}/usr/share/zsh/site-functions/_git-stack"
+      install -Dm644 "./completions/git-stack.fish" "${pkgdir}/usr/share/fish/vendor_completions.d/git-stack.fish"
+
+      # man pages
+      install -Dm644 "./manpages/git-stack.1.gz" "${pkgdir}/usr/share/man/man1/git-stack.1.gz"
+snapcrafts:
+  -
+    name: git-stack
+    publish: true
+    summary: Stack based git workflow for GitHub
+    description: |
+      Stack based git workflow for GitHub. For more information, visit the project's homepage. https://github.com/fcjr/git-stack
+    grade: stable
+    confinement: strict
+    license: MIT
+    base: core20
+    apps:
+      git-stack:
+        plugs: ["network"]
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
